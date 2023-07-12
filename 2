@@ -1,0 +1,51 @@
+import numpy as np
+import pandas as pd
+import copy
+data=pd.read_excel('C:\\Users\\exam2\\Downloads\\candidateelimination.xlsx')
+data
+G=[['?']*len(data.loc[0])]*len(data.loc[0])
+S=['']*len(data.loc[0])
+print(G)
+t=[]
+def compare(t,l):
+    if(len(t)==0):
+        return l
+    else:
+        for i in range(len(l)):
+            if t[i]==l[i]:
+                continue
+            else:
+                t[i]='?'
+    return t
+def compare1(t,l):
+    for i in range(len(l)):
+        if(l[i]!=t[i]):
+            a1=copy.deepcopy(G[i])
+            a1[i]=t[i]
+            G[i]=a1
+for i in range(len(data)):
+    l=[]
+    for j in range(len(data.loc[i])):
+        l.append(data.iloc[i,j])
+    #print(l)
+    if(l[-1]=='yes'):
+        G[i]=G[i]
+        print(G[i])
+        S=compare(t,l)
+        t=S
+    elif(l[-1]=='no '):
+        compare1(t,l)
+        t=S
+G.pop(-1)
+S.pop(-1)
+print('Specific Hypothesis',S)
+print('General Hypothesis ',G)
+G1=[]
+for i in S:
+    if i!='?':
+        for j in G:
+            if i in j:
+                G1.append(j)
+print('General Hypothesis',G1)
+print('Specific Hypothesis',S)
+print(S)
