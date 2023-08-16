@@ -1,0 +1,13 @@
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score,precision_score,recall_score,confusion_matrix
+d=read_csv('text_classification.csv',names=['message','label'])
+d['label_num']=d['label'].map({'pos':1,'neg':0})
+xtrain,xtest,ytrain,ytest=train_test_split(d.message,d.label_num)
+cv=CountVectorizer()
+xtrain_dtm=cv.fit_transform(xtrain)
+xtest_dtm=cv.transform(xtest)
+clf=MultinomialNB().fit(xtrain_dtm,ytrain)
+predicted=clf.predict(xtest_dtm)
+print(accuracy_score(ytest,predicted))
