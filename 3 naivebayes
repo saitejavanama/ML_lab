@@ -1,0 +1,48 @@
+import numpy as np
+import pandas as pd
+
+df=np.loadtxt('tennis.csv',delimiter=',',dtype=str,skiprows=1)
+train=df[:10]
+test=df[10:]
+p_yes=p_no=0
+d1={}
+d2={}
+for i in train:
+    if i[-1]=='yes':
+        p_yes+=1
+        for k in i[:-1]:
+            d1[k]=d1.get(k,0)+1
+    else:
+        p_no+=1
+        for k in i[:-1]:
+            d2[k]=d2.get(k,0)+1
+
+d={}
+for i in d1.keys():
+    d1[i]=d1[i]/p_yes
+for i in d2.keys():
+    d2[i]=d2[i]/p_no
+
+count=0
+for i in test:
+    print(i)
+    p=p_yes/len(train)
+    n=p_no/len(train)
+    for k in range(len(train[0])-1):
+        if i[k] in d1.keys():
+            p*=d1[i[k]]
+        else:
+            p=0
+        if i[k] in d2.keys():
+            n*=d2[i[k]]
+        else:
+            n=0
+    if(p>n):
+        if(i[-1]=='yes'):
+            count+=1
+        print("yes")
+    else:
+        if(i[-1]=="no"):
+            count+=1
+        print("no")
+print("Accuracy : ",count/len(test)*100)
