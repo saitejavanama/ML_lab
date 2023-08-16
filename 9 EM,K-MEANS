@@ -1,0 +1,53 @@
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans 
+from sklearn.mixture import GaussianMixture 
+import sklearn.metrics as metrics
+from sklearn import datasets
+import pandas as pd 
+import numpy as np 
+from sklearn.preprocessing import StandardScaler
+#importing iris data to perform...
+iris=datasets.load_iris()
+x=pd.DataFrame(iris.data)
+x.columns=['Sepal_Length','Sepal_Width','Petal_Length','Petal_Width']
+y=pd.DataFrame(iris.target)
+y.columns=['Targets']
+
+
+#build k-Means model...
+d=KMeans(n_clusters=3)
+d.fit(x)
+
+#now visualise the clustering results...
+plt.figure(figsize=(14,14))
+cmap=np.array(['red','lime','black'])
+
+
+#now plot for the original classifications using petal features...
+plt.subplot(2,2,1)
+plt.scatter(x.Petal_Length,x.Petal_Width,c=cmap[y.Targets],s=40)
+plt.title('Real Clusters')
+plt.xlabel('Petal length')
+plt.ylabel('Petal width')
+
+#now plot the model classifications..
+plt.subplot(2,2,2)
+plt.scatter(x.Petal_Length,x.Petal_Width,c=cmap[d.labels_],s=40)
+plt.title('K means Clusters')
+plt.xlabel('Petal length')
+plt.ylabel('Petal width')
+
+#plot using gmm...
+s=StandardScaler()
+s.fit(x)
+xsa=s.transform(x)
+xs=pd.DataFrame(xsa,columns=x.columns)
+
+gmm=GaussianMixture(n_components=3)
+gmm.fit(xs)
+gmmy=gmm.predict(xs)
+plt.subplot(2,2,3)
+plt.scatter(x.Petal_Length,x.Petal_Width,c=cmap[gmmy],s=40)
+plt.title("GMM Clustering...")
+plt.xlabel("Petal Length")
+plt.ylabel('Petal Width')
