@@ -1,0 +1,16 @@
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import datasets
+iris=datasets.load_iris()
+x_train,x_test,y_train,y_test=train_test_split(iris.data,iris.target,test_size=0.1)
+for i in range(len(iris.target_names)):
+    print(i,"-",iris.target_names[i])
+cl=KNeighborsClassifier(n_neighbors=1)
+cl.fit(x_train,y_train)
+y_pred=cl.predict(x_test)
+for i in range(len(x_test)):
+    print(str(x_test[i]),str(y_test[i]),str(y_pred[i]))
+print("accuracy",cl.score(x_test,y_test))
+from sklearn.metrics import confusion_matrix,classification_report
+print(classification_report(y_test,y_pred))
+print(confusion_matrix(y_test,y_pred))
