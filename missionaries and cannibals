@@ -1,0 +1,75 @@
+#machinaries and cannibels
+from collections import deque
+
+def is_valid_state(missionaries, cannibals):
+    if missionaries < 0 or cannibals < 0:
+        return False
+    if missionaries > 3 or cannibals > 3:
+        return False
+    if (missionaries < cannibals and missionaries > 0) or (3 - missionaries < 3 - cannibals and 3 - missionaries > 0):
+        return False
+    return True
+
+def bfs_search():
+    initial_state = (3, 3, True)  # (missionaries on left, cannibals on left, boat on left)
+    if initial_state == (0, 0, False):  # If already at the goal state
+        return [initial_state]
+
+    queue = deque()
+    visited = set()
+    queue.append([initial_state])
+
+    while queue:
+        path = queue.popleft()
+        current_state = path[-1]
+        if current_state == (0, 0, False):  # If goal state is reached
+            return path
+        for successor in generate_successors(current_state):
+            if is_valid_state(successor[0], successor[1]) and successor not in visited:
+                visited.add(successor)
+                new_path = list(path)
+                new_path.append(successor)
+                queue.append(new_path)
+
+    return None
+
+def generate_successors(state):
+    successors = []
+    missionaries, cannibals, boat_on_left_bank = state
+
+    if boat_on_left_bank:
+        for i in range(3):
+            for j in range(3):
+                if i + j > 2 or i + j == 0:
+                    continue
+                successor = (missionaries - i, cannibals - j, not boat_on_left_bank)
+                successors.append(successor)
+    else:
+        for i in range(3):
+            for j in range(3):
+                if i + j > 2 or i + j == 0:
+                    continue
+                successor = (missionaries + i, cannibals + j, not boat_on_left_bank)
+                successors.append(successor)
+
+    return successors
+
+def print_solution(solution):
+    if solution is None:
+        print("No solution found.")
+        return
+
+    print("Solution found!")
+    for i, state in enumerate(solution):
+        missionaries_left = state[0]
+        cannibals_left = state[1]
+        boat_position = "left" if state[2] else "right"
+        missionaries_right = 3 - missionaries_left
+        cannibals_right = 3 - cannibals_left
+
+        print(f"  {missionaries_left}  {cannibals_left} {boat_position} |||",end=" ")
+        print(f"  {missionaries_right}  {cannibals_right}")
+
+# Run the BFS search and print the solution
+solution = bfs_search()
+print_solution(solution)
