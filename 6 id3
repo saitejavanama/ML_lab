@@ -1,0 +1,56 @@
+import pandas as pd
+import numpy as np
+import math
+data = pd.read_csv('play_tennis.csv')
+del data['day']
+target = 'play'
+
+def entropy(d):
+    s = d[target]
+    p = len(s[s=="Yes"])
+    n = len(s[s=="No"])
+    a,b= p/(p+n),n/(p+n)
+    if a == 0: return -round(b*math.log2(b), 2)
+    elif b == 0: return -round(a*math.log2(a), 2)
+    return -round((a*math.log2(a)+b*math.log2(b)), 2)
+
+def root_selection(d):
+    attr = d.columns[:-1]
+    n = len(d)
+    root = ''
+    q = 0
+    for att in attr:
+        unique = d[att].unique()
+        s = 0
+        e = entropy(d)
+
+        for u in unique:
+            s += (len(d[d[att] == u])/n)*entropy(d[d[att] == u])
+        if (e-s) > q:
+            q = e-s
+            root = att
+    return root
+
+tree = {}
+d = data
+root = root_selection(d)
+current_root = [root, d.index]
+tree[current_root[0]] = []
+opened = [current_root]
+while len(opened) != 0:
+    current_root = opened.pop(0)
+    for child in data[current_root[0]].unique():
+        d = data.loc[current_root[-1]]
+        tree[current_root[0]].append(child)
+        p = len(d[(d[current_root[0]] == child) & (d[target] == 'Yes')])
+        n = len(d[(d[current_root[0]] == child) & (d[target] == 'No')])
+        if p == 0:tree[child] = 'No'
+        elif n == 0:tree[child] = 'Yes'
+        else:
+            d1 = d[d[current_root[0]] == child]
+            r = root_selection(d1)
+            tree[child] = [r]
+            tree[r] = []
+            opened.append([r, d1.index])
+for i in tree:
+    print(i, tree[i])
